@@ -1,0 +1,74 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\CppNet.dll" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\libmojoshader_64.dll" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\mgfxc.deps.json" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\mgfxc.dll" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\mgfxc.exe" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\mgfxc.pdb" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\mgfxc.runtimeconfig.dev.json" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\mgfxc.runtimeconfig.json" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\SharpDX.D3DCompiler.dll" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\SharpDX.D3DCompiler.xml" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\SharpDX.dll" />
+    <Content Remove="C:\Users\evgen\.nuget\packages\monogame.extended\3.8.0\contentFiles\any\netstandard2.0\SharpDX.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Content\bin\Fonts\joystix-32.xnb" />
+    <None Remove="Content\bin\Fonts\joystix-64.xnb" />
+    <None Remove="Content\bin\Fonts\joystix.xnb" />
+    <None Remove="Content\bin\Fonts\ptmono-12.xnb" />
+    <None Remove="Content\bin\Fonts\ptmono-24.xnb" />
+    <None Remove="Content\bin\Fonts\ptmono-32.xnb" />
+    <None Remove="Content\bin\Sounds\Hit_Hurt.xnb" />
+    <None Remove="Content\bin\Sounds\Hit_Hurt5.xnb" />
+    <None Remove="Content\bin\Sounds\Powerup.xnb" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Content\bin\Fonts\joystix-32.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\bin\Fonts\joystix-64.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\bin\Fonts\joystix.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\bin\Fonts\ptmono-12.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\bin\Fonts\ptmono-24.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\bin\Sounds\Hit_Hurt.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\bin\Sounds\Hit_Hurt5.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\bin\Sounds\Powerup.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Extended" Version="3.8.0" />
+    <PackageReference Include="MonoGame.Extended.Graphics" Version="3.8.0" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Content\Sounds\" />
+  </ItemGroup>
+
+</Project>
