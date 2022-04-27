@@ -15,20 +15,6 @@ namespace CS50.Pong
         private SoundEffect _wallHitSound;
         private SoundEffect _pointSound;
         private ScreenParameters? _screenParameters;
-
-        private const int WINDOW_WIDTH = 1280;
-        private const int WINDOW_HEIGHT = 720;
-        private const int WINDOW_VIRTUAL_WIDTH = 432;
-        private const int WINDOW_VIRTUAL_HEIGHT = 243;
-        private const int PADDLE_SPEED = 200;
-        private const int PADDLE_WIDTH = 5;
-        private const int PADDLE_HEIGHT = 20;
-        private const int BALL_WIDTH = 4;
-        private const int BALL_HEIGHT = 4;
-        private const float BALL_SPEED = 100f;
-        private const int WIN_SCORE = 10;
-        private const float BALL_SPEED_MULTIPLIER = 1.05f;
-
         private RenderTarget2D? _virtualRenderTarget;
 
         private Color _backgroundColor;
@@ -56,7 +42,7 @@ namespace CS50.Pong
 
         protected override void Initialize()
         {
-            _screenParameters = new ScreenParameters(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_VIRTUAL_WIDTH, WINDOW_VIRTUAL_HEIGHT);
+            _screenParameters = new ScreenParameters(PongGameConstants.WINDOW_WIDTH, PongGameConstants.WINDOW_HEIGHT, PongGameConstants.WINDOW_VIRTUAL_WIDTH, PongGameConstants.WINDOW_VIRTUAL_HEIGHT);
 
             _graphics.PreferredBackBufferWidth = _screenParameters.RealWidth;
             _graphics.PreferredBackBufferHeight = _screenParameters.RealHeight;
@@ -72,24 +58,24 @@ namespace CS50.Pong
             Components.Add(new InputHandler(this));
 
             _player1Paddle = new Paddle(
-                PADDLE_WIDTH,
-                PADDLE_HEIGHT,
-                new Vector2(PADDLE_WIDTH, _screenParameters.VirtualHeight / 2),
-                PADDLE_SPEED);
+                PongGameConstants.PADDLE_WIDTH,
+                PongGameConstants.PADDLE_HEIGHT,
+                new Vector2(PongGameConstants.PADDLE_WIDTH, _screenParameters.VirtualHeight / 2),
+                PongGameConstants.PADDLE_SPEED);
 
             _player2Paddle = new Paddle(
-                PADDLE_WIDTH,
-                PADDLE_HEIGHT,
-                new Vector2(_screenParameters.VirtualWidth - PADDLE_WIDTH, _screenParameters.VirtualHeight / 2),
-                PADDLE_SPEED);
+                PongGameConstants.PADDLE_WIDTH,
+                PongGameConstants.PADDLE_HEIGHT,
+                new Vector2(_screenParameters.VirtualWidth - PongGameConstants.PADDLE_WIDTH, _screenParameters.VirtualHeight / 2),
+                PongGameConstants.PADDLE_SPEED);
 
             _random = new Random();
 
-            _ballStartingPosition = new Vector2(_screenParameters.VirtualWidth / 2 - BALL_WIDTH / 2, _screenParameters.VirtualHeight / 2 - BALL_HEIGHT);
+            _ballStartingPosition = new Vector2(_screenParameters.VirtualWidth / 2 - PongGameConstants.BALL_WIDTH / 2, _screenParameters.VirtualHeight / 2 - PongGameConstants.BALL_HEIGHT);
 
             _ball = new Ball(
-                BALL_WIDTH,
-                BALL_HEIGHT,
+                PongGameConstants.BALL_WIDTH,
+                PongGameConstants.BALL_HEIGHT,
                 _ballStartingPosition,
                 GetRandomBallVelocity());
 
@@ -100,7 +86,7 @@ namespace CS50.Pong
 
         private Vector2 GetRandomBallVelocity()
         {
-            return new Vector2(_random.Next(2) == 0 ? BALL_SPEED : -BALL_SPEED, (float)_random.Next(-50, 51));
+            return new Vector2(_random.Next(2) == 0 ? PongGameConstants.BALL_SPEED : -PongGameConstants.BALL_SPEED, (float)_random.Next(-50, 51));
         }
 
         protected override void LoadContent()
@@ -161,61 +147,61 @@ namespace CS50.Pong
                     {
                         _ball.Update(deltaTime);
 
+                        if (_ball.IsCollide(_player1Paddle))
+                        {
+                            _ball.Velocity = new Vector2(-_ball.Velocity.X * PongGameConstants.BALL_SPEED_MULTIPLIER, _ball.Velocity.Y < 0 ? -(float)_random.Next(10, 100) : _random.Next(10, 100));
+                            _ball.Position = new Vector2(_ball.Position.X + (_ball.Position.X - _ball.Width / 2 - _player1Paddle.Position.X + _player1Paddle.Width / 2), _ball.Position.Y);
+
+                            _paddleHitSound.Play();
+                        }
+                        else if (_ball.IsCollide(_player2Paddle))
+                        {
+                            _ball.Velocity = new Vector2(-_ball.Velocity.X * PongGameConstants.BALL_SPEED_MULTIPLIER, _ball.Velocity.Y < 0 ? -(float)_random.Next(10, 150) : _random.Next(10, 150));
+                            _ball.Position = new Vector2(_ball.Position.X - ((_ball.Position.X + _ball.Width / 2) - (_player2Paddle.Position.X - _player2Paddle.Width / 2)), _ball.Position.Y);
+
+                            _paddleHitSound.Play();
+                        }
+
+                        if (_ball.AABB.Top <= 0)
+                        {
+                            _ball.Position = new Vector2(_ball.Position.X, _ball.Width / 2);
+                            _ball.Velocity *= new Vector2(1, -1);
+
+                            _wallHitSound.Play();
+                        }
+                        else if (_ball.AABB.Bottom >= _screenParameters.VirtualHeight)
+                        {
+                            _ball.Position = new Vector2(_ball.Position.X, _screenParameters.VirtualHeight - _ball.Width / 2);
+                            _ball.Velocity *= new Vector2(1, -1);
+
+                            _wallHitSound.Play();
+                        }
+
+                        if (_ball.Position.X <= 0)
+                        {
+                            ResetBall();
+
+                            _player2Score++;
+
+                            _pointSound.Play();
+                        }
+                        else if (_ball.Position.X >= _screenParameters.VirtualWidth)
+                        {
+                            ResetBall();
+
+                            _player1Score++;
+
+                            _pointSound.Play();
+                        }
+
+                        if (_player1Score == PongGameConstants.WIN_SCORE
+                            || _player2Score == PongGameConstants.WIN_SCORE)
+                        {
+                            _gameState = GameState.Win;
+                        }
+
                         break;
                     }
-            }
-
-            if (_ball.IsCollide(_player1Paddle))
-            {
-                _ball.Velocity = new Vector2(-_ball.Velocity.X * BALL_SPEED_MULTIPLIER, _ball.Velocity.Y < 0 ? -(float)_random.Next(10,100) : _random.Next(10,100));
-                _ball.Position = new Vector2(_ball.Position.X + (_ball.Position.X - _ball.Width / 2 - _player1Paddle.Position.X + _player1Paddle.Width / 2), _ball.Position.Y);
-
-                _paddleHitSound.Play();
-            }
-            else if (_ball.IsCollide(_player2Paddle))
-            {
-                _ball.Velocity = new Vector2(-_ball.Velocity.X * BALL_SPEED_MULTIPLIER, _ball.Velocity.Y < 0 ? -(float)_random.Next(10, 150) : _random.Next(10, 150));
-                _ball.Position = new Vector2(_ball.Position.X - ((_ball.Position.X + _ball.Width / 2) - (_player2Paddle.Position.X - _player2Paddle.Width / 2)), _ball.Position.Y);
-
-                _paddleHitSound.Play();
-            }
-
-            if (_ball.AABB.Top <= 0)
-            {
-                _ball.Position = new Vector2(_ball.Position.X, _ball.Width / 2);
-                _ball.Velocity *= new Vector2(1, -1);
-
-                _wallHitSound.Play();
-            }
-            else if (_ball.AABB.Bottom >= _screenParameters.VirtualHeight)
-            {
-                _ball.Position = new Vector2(_ball.Position.X, _screenParameters.VirtualHeight - _ball.Width / 2);
-                _ball.Velocity *= new Vector2(1, -1);
-
-                _wallHitSound.Play();
-            }
-
-            if (_ball.Position.X <= 0)
-            {
-                ResetBall();
-
-                _player2Score++;
-
-                _pointSound.Play();
-            }
-            else if (_ball.Position.X >= _screenParameters.VirtualWidth)
-            {
-                ResetBall();
-
-                _player1Score++;
-
-                _pointSound.Play();
-            }
-
-            if (_player1Score == WIN_SCORE
-                || _player2Score == WIN_SCORE)
-            {
-                _gameState = GameState.Win;
             }
 
             base.Update(gameTime);
@@ -254,26 +240,26 @@ namespace CS50.Pong
             {
                 _player1Paddle.Position = new Vector2(
                     _player1Paddle.Position.X,
-                    MathF.Max(PADDLE_HEIGHT / 2, _player1Paddle.Position.Y + -PADDLE_SPEED * deltaTime));
+                    MathF.Max(PongGameConstants.PADDLE_HEIGHT / 2, _player1Paddle.Position.Y + -PongGameConstants.PADDLE_SPEED * deltaTime));
             }
             else if (InputHandler.IsKeyDown(Keys.S))
             {
                 _player1Paddle.Position = new Vector2(
                     _player1Paddle.Position.X,
-                    MathF.Min(_screenParameters.VirtualHeight - PADDLE_HEIGHT / 2, _player1Paddle.Position.Y + PADDLE_SPEED * deltaTime));
+                    MathF.Min(_screenParameters.VirtualHeight - PongGameConstants.PADDLE_HEIGHT / 2, _player1Paddle.Position.Y + PongGameConstants.PADDLE_SPEED * deltaTime));
             }
 
             if (InputHandler.IsKeyDown(Keys.Up))
             {
                 _player2Paddle.Position = new Vector2(
                     _player2Paddle.Position.X,
-                    MathF.Max(PADDLE_HEIGHT / 2, _player2Paddle.Position.Y + -PADDLE_SPEED * deltaTime));
+                    MathF.Max(PongGameConstants.PADDLE_HEIGHT / 2, _player2Paddle.Position.Y + -PongGameConstants.PADDLE_SPEED * deltaTime));
             }
             else if (InputHandler.IsKeyDown(Keys.Down))
             {
                 _player2Paddle.Position = new Vector2(
                     _player2Paddle.Position.X,
-                    MathF.Min(_screenParameters.VirtualHeight - PADDLE_HEIGHT / 2, _player2Paddle.Position.Y + PADDLE_SPEED * deltaTime));
+                    MathF.Min(_screenParameters.VirtualHeight - PongGameConstants.PADDLE_HEIGHT / 2, _player2Paddle.Position.Y + PongGameConstants.PADDLE_SPEED * deltaTime));
             }
         }
 
@@ -315,13 +301,13 @@ namespace CS50.Pong
         {
             var player1ScoreScreenSize = font.MeasureString(_player1Score.ToString());
             var player2ScoreScreenSize = font.MeasureString(_player2Score.ToString());
-            _spriteBatch.DrawString(font, _player1Score.ToString(), new Vector2(WINDOW_VIRTUAL_WIDTH / 2 - player1ScoreScreenSize.X * 2, WINDOW_VIRTUAL_HEIGHT / 3), Color.White);
-            _spriteBatch.DrawString(font, _player2Score.ToString(), new Vector2(WINDOW_VIRTUAL_WIDTH / 2 + player2ScoreScreenSize.X, WINDOW_VIRTUAL_HEIGHT / 3), Color.White);
+            _spriteBatch.DrawString(font, _player1Score.ToString(), new Vector2(PongGameConstants.WINDOW_VIRTUAL_WIDTH / 2 - player1ScoreScreenSize.X * 2, PongGameConstants.WINDOW_VIRTUAL_HEIGHT / 3), Color.White);
+            _spriteBatch.DrawString(font, _player2Score.ToString(), new Vector2(PongGameConstants.WINDOW_VIRTUAL_WIDTH / 2 + player2ScoreScreenSize.X, PongGameConstants.WINDOW_VIRTUAL_HEIGHT / 3), Color.White);
         }
 
         private void DrawWinnerText(SpriteFont font)
         {
-            var winnerText = _player1Score == WIN_SCORE
+            var winnerText = _player1Score == PongGameConstants.WIN_SCORE
                 ? "Player 1 is WINNER!"
                 : "Player 2 is WINNER!";
 
@@ -353,8 +339,8 @@ namespace CS50.Pong
         private void DrawPlayer1Paddle()
         {
             _spriteBatch.DrawRectangle(
-                _player1Paddle.Position.X - PADDLE_WIDTH / 2,
-                _player1Paddle.Position.Y - PADDLE_HEIGHT / 2,
+                _player1Paddle.Position.X - PongGameConstants.PADDLE_WIDTH / 2,
+                _player1Paddle.Position.Y - PongGameConstants.PADDLE_HEIGHT / 2,
                 _player1Paddle.Width,
                 _player1Paddle.Height,
                 Color.White,
@@ -364,8 +350,8 @@ namespace CS50.Pong
         private void DrawPlayer2Paddle()
         {
             _spriteBatch.DrawRectangle(
-                _player2Paddle.Position.X - PADDLE_WIDTH / 2,
-                _player2Paddle.Position.Y - PADDLE_HEIGHT / 2,
+                _player2Paddle.Position.X - PongGameConstants.PADDLE_WIDTH / 2,
+                _player2Paddle.Position.Y - PongGameConstants.PADDLE_HEIGHT / 2,
                 _player2Paddle.Width,
                 _player2Paddle.Height,
                 Color.White,
