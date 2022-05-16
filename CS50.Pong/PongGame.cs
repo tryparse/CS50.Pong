@@ -123,6 +123,8 @@ namespace CS50.Pong
                         {
                             _gameState = GameState.Start;
 
+                            ResetGame();
+
                             break;
                         }
                     case GameState.Play:
